@@ -1,0 +1,93 @@
+STUDENT PERFORMANCE PREDICTION SYSTEM (SPPS) - COMPREHENSIVE DOCUMENTATION
+===========================================================================
+
+1. OVERVIEW AND PURPOSE
+---------------------------------------------------------------------------
+The Student Performance Prediction System (SPPS) is an AI-powered EdTech web application designed to locally predict student outcomes and identify at-risk students before they fail. It leverages modern machine learning alongside a strict "Industrial Skeuomorphic" UX to provide educational administrators, teachers, and counsellors with precise, real-time data regarding student trajectories. Instead of standard analytical dashboards, SPPS operates like a "mission control" or "industrial systems monitor," ensuring a highly tactical and urgent user experience.
+
+2. TECHNICAL STACK
+---------------------------------------------------------------------------
+Backend (API & Machine Learning Layer)
+- Python 3.13
+- FastAPI: High-performance async API server.
+- Motor (MongoDB): Async driver for a local MongoDB instance.
+- Uvicorn: ASGI server running the FastAPI app.
+- PyJWT & Bcrypt(v4.0.1): Secure JWT-based authentication and hashing.
+- XGBoost: Primary machine learning classification model predicting failure risk.
+- SHAP (SHapley Additive exPlanations): Provides the explainability factor, telling the system exactly *why* a student is predicted to fail (e.g. low attendance vs missed assignments).
+- Pandas / NumPy / Scikit-Learn: Used for data engineering, modeling, and inference formatting.
+
+Frontend (User Interface Layer)
+- React 19 (TypeScript): Component-driven SPA framework.
+- Vite: Lightning fast local build tool / dev server.
+- Tailwind CSS v4: Core styling engine. Utilizes custom CSS variable overrides to create the Industrial Skueomorphic design.
+- Recharts: For rendering performance graphs and SHAP factor bar charts.
+- React Router DOM: For handling client-side routing and protected routes.
+- Lucide React: For iconography that matches the sharp, tactical visual identity.
+
+3. ARCHITECTURE AND DATA FLOW
+---------------------------------------------------------------------------
+A. Authentication & Routing
+The frontend sends login credentials to the FastAPI `/token` endpoint, which returns an encoded JWT. The JWT encapsulates the user's ID, Role, and Department. This token is passed in an Authorization header for all subsequent API requests. The frontend React Router restricts access based on token presence, redirecting unauthenticated users to `/login`.
+
+B. Predictive Flow
+When a student's profile is viewed or updated:
+1. The backend retrieves the student's metrics (attendance, scores, LMS hours).
+2. The data is converted to an XGBoost-compatible format.
+3. The trained ML model outputs a probability of failure.
+4. The SHAP explainer runs on the data to extract the top impacting features.
+5. The combined prediction + SHAP explanations are saved to the student array.
+
+4. USER ROLES & CLEARANCES 
+---------------------------------------------------------------------------
+The system partitions view capabilities into four heavily distinct clearance levels. When users register via `/register`, they are allocated to these respective roles:
+
+- Admin: Has a macro "Global Systems" overview. Sees aggregated histograms, distribution pie charts, and risk indices across all departments.
+- Teacher: Has a "Class Monitor" readout. Focuses heavily on average statistics (attendance, quiz scores) and handles specific subject rosters to flag at-risk trends.
+- Counsellor: Acts on an "Intervention Kanban." The counsellor sees all cross-department struggling variables, maintaining a queue of specific action plans like 'Mentorship' or 'Deadline Extenions'.
+- Student: Has a "Vitals Telemetry" read. They only view their own isolated performance signatures and read the "Drift Analysis" (the AI's reasoning) to understand how to improve.
+
+5. DESIGN SYSTEM: INDUSTRIAL SKEUOMORPHISM
+---------------------------------------------------------------------------
+The user interface is completely antithetical to modern consumer 'Glassmorphic' or 'Flat' design. It enforces:
+
+Color Palette:
+- Chassis Backgrounds (`#1e2130`): Dark, cool steel colors defining the hardware plates.
+- Status LEDs (`#f87171` red, `#fbbf24` amber, `#34d399` green): Used sparingly to indicate system threats and successes.
+- Muted Chrome (`#6b7185` / `#9aa0b4`): Representing recessed or etched instructional text.
+
+Typography:
+- Primary Sans (IBM Plex Sans): Used for strong, legible headers.
+- Primary Mono (IBM Plex Mono): Heavily utilized for all metrics, telemetry readouts, table headers, and status strings. Gives the system an immediate "terminal" or "hardware screen" feel.
+
+Component Styling:
+- Metric Cards: Emulate physical hardware gauges. They possess inset shadow displays, mono-spaced values, and glowing LED indicators that physically light up based on system health.
+- Containers: Instead of rounded, soft, hovering shadows, containers feature sharp geometric borders, inset shadows (`shadow-recess`) to look carved, and slight gradients to mimic light hitting physical plastic/metal.
+- Buttons (`.btn-primary`): Have physical volume, simulating a heavy tactile click with inset active states.
+
+6. CORE FUNCTIONAL MODULES
+---------------------------------------------------------------------------
+A. Authentication Terminals (`LoginPage.tsx`, `RegisterPage.tsx`):
+Hardware-style boot grids for validating access.
+
+B. Side Navigation (`Sidebar.tsx`):
+Acts as the left-hand command control surface. Features LED activation states to indicate which system module is currently engaged.
+
+C. Global Dashboards (`DashboardPage.tsx`):
+Renders different modules natively based on User role (Matrix vs Monitor).
+
+D. Roster Telemetry (`StudentsPage.tsx`):
+Sortable system database containing all active entity profiles and their macro risk scores.
+
+E. Target Intervention Matrix (`InterventionsPage.tsx`):
+Ticket-based flow system moving subjects from 'Pending' -> 'In Progress' -> 'Resolved'. 
+
+F. Neural AI Profile View (`StudentProfilePage.tsx`):
+A specific deep dive into a single student. Generates a physical SHAP Bar Chart showing specifically what factors are pulling a student into "Risk" Territory, and an Action Protocol deployment console.
+
+7. EXECUTION REQUIREMENTS
+---------------------------------------------------------------------------
+- MongoDB MUST be running as a local daemon at `mongodb://localhost:27017`.
+- Backend runs on `localhost:8000` via Uvicorn.
+- Frontend runs on `localhost:5173` via Vite.
+- Test accounts can be autogenerated via `python seed_data.py`.
